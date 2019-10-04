@@ -1,20 +1,20 @@
-let CONTROLLER = require("../controller/driverController");
-let auth = require("../../util/auth");
+let driverController = require("../controller/driverController");
+let auth = require("../util/authDriver");
 
 module.exports = (APP) => {
 
     APP.route('/api/driver/login')
-        .get(CONTROLLER.driverController.login);
+        .get(driverController.login);
     APP.route('/api/driver/verifyOTP')
-        .get(CONTROLLER.driverController.verifyOTP);
+        .get(driverController.verifyOTP);
     APP.route('/api/driver/addVehicle')
-        .post(CONTROLLER.driverController.addVehicle);
+        .post(driverController.addVehicle);
     APP.route('/api/driver/details')
-        .get(CONTROLLER.driverController.details);
+        .get(driverController.details);
     APP.route('/api/driver/modifyMedical')
-        .put(CONTROLLER.driverController.modifyMedical);
+        .put(driverController.modifyMedical);
     APP.route('/api/driver/sos')
-        .post(CONTROLLER.driverController.sos);
+        .post(driverController.sos);
     APP.route('/api/driver/emergency')
-        .post(CONTROLLER.driverController.emergency);
+        .post(driverController.emergency);
 };

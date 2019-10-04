@@ -1,7 +1,6 @@
-import {
-    fineSchema
-} from './fine.model'
 const mongoose = require('mongoose');
+const fineModel = require('./fine.model');
+const fineSchema = fineModel.schema;
 
 const vehicleSchema = new mongoose.Schema({
     registration_no: {

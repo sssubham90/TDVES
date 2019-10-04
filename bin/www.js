@@ -1,5 +1,3 @@
-'use strict';
-
 /***********************************
  **** node module defined here *****
  ***********************************/
@@ -16,8 +14,13 @@ const app = EXPRESS();
  ********************************/
 app.set('port', process.env.PORT);
 app.use(EXPRESS.static("client"));
-app.use(BODY_PARSER.json({ limit: '50mb' }));
-app.use(BODY_PARSER.urlencoded({ limit: '50mb', extended: true }));
+app.use(BODY_PARSER.json({
+    limit: '50mb'
+}));
+app.use(BODY_PARSER.urlencoded({
+    limit: '50mb',
+    extended: true
+}));
 
 /*******************************
  *** For handling CORS Error ***
@@ -41,7 +44,7 @@ require('../server/routes/hospitalRoutes')(app);
 /** server listening */
 module.exports = () => {
     /** Server is running here */
-    app.listen(process.env.PORT, () => {
-        Console.log(`Server started at PORT: ${process.env.port}`);
+    app.listen(process.env.PORT || 3000, () => {
+        console.log(`Server started at PORT: ${process.env.port || 3000}`);
     });
 };

@@ -1,7 +1,6 @@
-import {
-    fineDetailSchema
-} from './fine_detail.model'
 const mongoose = require('mongoose');
+const fineDetailModel = require('./fine_detail.model');
+const fineDetailSchema = fineDetailModel.schema;
 
 const fineSchema = new mongoose.Schema({
 

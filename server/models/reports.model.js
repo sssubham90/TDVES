@@ -142,4 +142,4 @@ const reportsSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('hospital', hospitalSchema);
+module.exports = mongoose.model('reports', reportsSchema);

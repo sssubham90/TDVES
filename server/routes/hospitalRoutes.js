@@ -1,13 +1,13 @@
-let CONTROLLER = require("../controller/hospitalController");
-let auth = require("../../util/auth");
+let hospitalController = require("../controller/hospitalController");
+let auth = require("../util/authHospital");
 
 module.exports = (APP) => {
 
     APP.route('/api/hospital/login')
-        .get(CONTROLLER.hospitalController.login);
-    APP.route('/api/hospital/emergencies')
-        .get(CONTROLLER.hospitalController.emergencies);
+        .get(hospitalController.login);
+    APP.route('/api/hospital/emergency')
+        .get(hospitalController.emergency);
     APP.route('/api/hospital/confirmEmergency')
-        .get(CONTROLLER.hospitalController.confirmEmergency);
+        .put(hospitalController.confirmEmergency);
 
 };
