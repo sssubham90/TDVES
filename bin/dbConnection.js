@@ -11,7 +11,7 @@ module.exports = (URL) => {
             if (err)
                 reject(err);
             else
-                resolve(null);
+                resolve();
         });
     })
 };

@@ -8,5 +8,5 @@ db(serverConfig.mongodb.url).then(resolve => {
     console.log(`*********DB is connected successfully*********`);
     www();
 }).catch(err => {
-    console.log(`*********err*********  ${err}`);
+    console.log(`*********err*********\n${err}`);
 });
