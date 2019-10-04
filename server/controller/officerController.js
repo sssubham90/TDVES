@@ -1,5 +1,5 @@
 let officerController = {};
-let OFFICER = require("../models/officer.model");
+let Officer = require("../models/officer.model");
 
 officerController.login = (REQUEST, RESPONSE) => {};
 officerController.verifyOTP = (REQUEST, RESPONSE) => {};

@@ -1,5 +1,5 @@
 let driverController = {};
-let DRIVER = require("../models/driver.model");
+let Driver = require("../models/driver.model");
 
 driverController.login = (REQUEST, RESPONSE) => {};
 driverController.verifyOTP = (REQUEST, RESPONSE) => {};
