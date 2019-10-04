@@ -78,6 +78,10 @@ const driverSchema = new mongoose.Schema({
     },
     fines: [{
         type: fineSchema
+    }],
+    tokens: [{
+        type: String,
+        unique: true
     }]
 });
 

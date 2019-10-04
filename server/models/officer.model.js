@@ -23,6 +23,10 @@ const officerSchema = new mongoose.Schema({
             required: true
         }
     },
+    tokens: [{
+        type: String,
+        unique: true
+    }]
 });
 
 module.exports = mongoose.model('officer', officerSchema);
