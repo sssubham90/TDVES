@@ -58,7 +58,7 @@ const vehicleSchema = new mongoose.Schema({
         required: [true, 'Engine Number required']
     },
     pucc: {
-        seriel_no: {
+        serial_no: {
             type: String,
             trim: true,
             required: [true, 'PUC Certificate Seriel Number required']

@@ -27,7 +27,7 @@ let create = () => {
         licence_no: '1774567',
         name: "Sehnab Das",
         gender: "male",
-        dob: new Date("1978-12-31"),
+        dob: new Date("1978-01-31"),
         phone: "9539785789",
         email: "zseh9151@gmail.com",
         address: "Plot no: 2, Kalinga Vihar, Patia, Bhubaneswar",
@@ -72,6 +72,69 @@ let create = () => {
         rule: "Diving without insurance or with invalid insurance",
         fine: 1500
     });
+
+    //Licence
+    License.create({
+        licence_no:'1234567',
+        name:'Zaehman Khan',
+        valid_from:new Date("2007-12-31"),
+        valid_till:new Date("2027-12-30"),
+        class_of_vehicle:"LMV",
+        issuing_authority:"Indian Union Driving Licence"
+    });
+    License.create({
+        licence_no:'1774567',
+        name:"Sehnab Das",
+        valid_from:new Date("1999-01-31"),
+        valid_till:new Date("2019-01-30"),
+        class_of_vehicle:"LMV",
+        issuing_authority:"Indian Union Driving Licence"
+    });
+
+    //Officer
+    Officer.create({
+        id:"124",
+        password:"abcd",
+        location:{
+            type:"Point",
+            coordinates:{93.47,98.52}
+        },
+    });
+
+    //Hospital
+    Hospital.create({
+        id:"H1",
+        location:{
+            type:"Point",
+            coordinates:{94.67,98.72}
+        },
+
+    });
+
+    //Vechile
+    Vehicle.create({
+        registration_no:"OD33Q1234",
+        class_of_vehicle:"LMV",
+        manufacturer:"SUZUKI",
+        owner_name:"Zaehman Khan",
+        seating_capacity:4,
+        cubic_capacity:999,
+        color:"Grey",
+        chasis_number:"MA6MFBC1BBT096358",
+        engine_number:"52WVC10338",
+        pucc:{
+            serial_no:"453",
+            date_of_issue: new Date("2019-5-1"),
+            date_of_expiry: new Date("2019-11-30"),
+            certifying_authority:"KK pollution testing Centre"
+        },
+        insurance:{
+            insurance_no:"07629534",
+            date_of_expiry: new Date("2019-11-30"),
+            insurer:"ICIC"
+        }
+    });
+
 };
 
 module.exports = {
