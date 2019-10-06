@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const fineDetailModel = require('./fine_detail.model');
-const fineDetailSchema = fineDetailModel.schema;
 
 const fineSchema = new mongoose.Schema({
 
@@ -35,7 +33,8 @@ const fineSchema = new mongoose.Schema({
         }
     },
     fine_details: [{
-        fineDetailSchema
+        rule: String,
+        fine_amt: Number
     }]
 });
 
