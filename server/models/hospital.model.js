@@ -24,7 +24,8 @@ const hospitalSchema = new mongoose.Schema({
         trim: true,
     }],
     tokens: [{
-        type: String
+        type: String,
+        required: true
     }]
 });
 

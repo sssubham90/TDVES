@@ -1,18 +1,15 @@
 const mongoose = require('mongoose');
 
-const reportsSchema = new mongoose.Schema({
-    id: {
-        type: String,
-        unique: true,
-        trim: true,
-        required: [true, 'Report ID required']
+const reportSchema = new mongoose.Schema({
+    date: {
+        type: Date,
+        required: [true, 'Driver date of birth required'],
     },
     reporter: {
-        licence_no: {
+        license_no: {
             type: String,
-            unique: true,
             trim: true,
-            required: [true, 'Driver driving licence no. required']
+            required: [true, 'Driver driving license no. required']
         },
         description: {
             type: String,
@@ -21,11 +18,10 @@ const reportsSchema = new mongoose.Schema({
         }
     },
     victim: {
-        licence_no: {
+        license_no: {
             type: String,
-            unique: true,
             trim: true,
-            required: [true, 'Driver driving licence no. required']
+            required: [true, 'Driver driving license no. required']
         },
         name: {
             type: String,
@@ -45,7 +41,7 @@ const reportsSchema = new mongoose.Schema({
             type: String,
             validate: {
                 validator: function(v) {
-                    return /\d{3}-\d{3}-\d{4}/.test(v);
+                    return /\d{10}/.test(v);
                 },
                 message: props => `${props.value} is not a valid phone number!`
             },
@@ -96,17 +92,14 @@ const reportsSchema = new mongoose.Schema({
         insurance: {
             insurance_no: {
                 type: String,
-                trim: true,
-                required: [true, 'Insurance Number is required']
+                trim: true
             },
             date_of_expiry: {
                 type: Date,
-                required: [true, 'Insurance Expiry Date is required']
             },
             insurer: {
                 type: String,
-                trim: true,
-                required: [true, 'Insurance Service Provider is required']
+                trim: true
             }
         },
     },
@@ -126,20 +119,17 @@ const reportsSchema = new mongoose.Schema({
             type: String,
             unique: true,
             trim: true,
-            required: [true, 'Hospital ID required']
         },
         location: {
             type: {
                 type: String,
                 enum: ['Point'],
-                required: true
             },
             coordinates: {
                 type: [Number],
-                required: true
             }
         },
     }
 });
 
-module.exports = mongoose.model('reports', reportsSchema);
+module.exports = mongoose.model('report', reportSchema);

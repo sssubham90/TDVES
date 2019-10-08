@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 const fineModel = require('./fine.model');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
+const sendOtp = require('../services/OTPService');
+
 const fineSchema = fineModel.schema;
 
 const driverSchema = new mongoose.Schema({
-    licence_no: {
+    license_no: {
         type: String,
         unique: true,
         trim: true,
-        required: [true, 'Driver driving licence no. required']
+        required: [true, 'Driver driving license no. required']
     },
     name: {
         type: String,
@@ -79,8 +83,58 @@ const driverSchema = new mongoose.Schema({
         type: fineSchema
     }],
     tokens: [{
-        type: String
+        access: {
+            type: String,
+            required: true
+        },
+        token: {
+            type: String,
+            required: true
+        }
     }]
 });
+
+driverSchema.methods.generateAuthToken = function(fn) {
+    var access = 'auth';
+    var token = jwt.sign({
+        _id: this._id.toHexString(),
+        access
+    }, 'devil');
+    this.tokens.push({
+        access,
+        token
+    });
+    this.save(function(err, doc, numbersAffected) {
+        fn(err, doc, token);
+    });
+}
+
+driverSchema.methods.toJSON = function() {
+    return _.omit(this.toObject(), ['tokens']);
+}
+
+driverSchema.methods.sendOtp = function(fn) {
+    sendOtp.send(this.phone, "TDVES", fn);
+}
+
+driverSchema.methods.verifyOtp = function(otp, fn) {
+    sendOtp.verify(this.phone, otp, fn);
+}
+
+driverSchema.statics.findByAuthToken = (token, fn) => {
+    var decoded;
+    var Driver = mongoose.model('driver', driverSchema);
+    try {
+        decoded = jwt.verify(token, 'devil');
+    } catch (e) {
+        fn(e, null);
+    }
+
+    Driver.findOne({
+        _id: decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    }, fn);
+}
 
 module.exports = mongoose.model('driver', driverSchema);

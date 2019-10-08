@@ -98,4 +98,11 @@ const vehicleSchema = new mongoose.Schema({
     }]
 });
 
+vehicleSchema.methods.addOwner = function(license_no, fn) {
+    this.owner_license_no = license_no;
+    this.save(function(err, doc, numbersAffected) {
+        fn(err, doc);
+    });
+}
+
 module.exports = mongoose.model('vehicle', vehicleSchema);

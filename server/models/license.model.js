@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const licenseSchema = new mongoose.Schema({
-    licence_no: {
+    license_no: {
         type: String,
         unique: true,
         trim: true,
-        required: [true, 'Licence no. required']
+        required: [true, 'License no. required']
     },
     name: {
         type: String,

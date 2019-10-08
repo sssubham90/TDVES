@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const fineSchema = new mongoose.Schema({
 
-    driver_licence_no: {
+    driver_license_no: {
         type: String,
         trim: true,
-        required: [true, 'Driver driving licence no. required']
+        required: [true, 'Driver driving license no. required']
     },
     vehicle_registration_no: {
         type: String,

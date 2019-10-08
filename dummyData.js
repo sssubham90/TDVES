@@ -3,13 +3,13 @@ let Officer = require("./server/models/officer.model");
 let Hospital = require("./server/models/hospital.model");
 let Vehicle = require("./server/models/vehicle.model");
 let License = require("./server/models/license.model");
-let Reports = require("./server/models/reports.model");
+let Report = require("./server/models/report.model");
 let Fine = require("./server/models/fine.model");
 
 let create = () => {
     // Driver
     Driver.create({
-        licence_no: '1234567',
+        license_no: '1234567',
         name: 'Zaehman Khan',
         gender: 'male',
         dob: new Date('1978-12-31'),
@@ -23,7 +23,7 @@ let create = () => {
         if (err) console.log(err);
     });
     Driver.create({
-        licence_no: '1774567',
+        license_no: '1774567',
         name: "Sehnab Das",
         gender: "male",
         dob: new Date("1978-01-31"),
@@ -74,22 +74,22 @@ let create = () => {
     });
     */
 
-    //Licence
+    //license
     License.create({
-        licence_no: '1234567',
+        license_no: '1234567',
         name: 'Zaehman Khan',
         valid_from: new Date("2007-12-31"),
         valid_till: new Date("2027-12-30"),
         class_of_vehicle: "LMV",
-        issuing_authority: "Indian Union Driving Licence"
+        issuing_authority: "Indian Union Driving License"
     });
     License.create({
-        licence_no: '1774567',
+        license_no: '1774567',
         name: "Sehnab Das",
         valid_from: new Date("1999-01-31"),
         valid_till: new Date("2019-01-30"),
         class_of_vehicle: "LMV",
-        issuing_authority: "Indian Union Driving Licence"
+        issuing_authority: "Indian Union Driving License"
     });
 
     //Officer

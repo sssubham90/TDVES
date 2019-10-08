@@ -24,7 +24,8 @@ const officerSchema = new mongoose.Schema({
         }
     },
     tokens: [{
-        type: String
+        type: String,
+        required: true
     }]
 });
 
