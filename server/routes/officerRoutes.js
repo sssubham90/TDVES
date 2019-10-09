@@ -1,5 +1,4 @@
 let officerController = require("../controller/officerController");
-let auth = require("../util/authOfficer");
 
 module.exports = (APP) => {
 

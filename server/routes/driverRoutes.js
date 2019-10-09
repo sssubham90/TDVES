@@ -1,5 +1,4 @@
 let driverController = require("../controller/driverController");
-let auth = require("../util/authDriver");
 
 module.exports = (APP) => {
 

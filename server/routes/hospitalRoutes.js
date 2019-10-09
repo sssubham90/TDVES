@@ -1,5 +1,4 @@
 let hospitalController = require("../controller/hospitalController");
-let auth = require("../util/authHospital");
 
 module.exports = (APP) => {
 
