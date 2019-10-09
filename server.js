@@ -1,5 +1,4 @@
 let www = require('./bin/www.js');
-
 let db = require('./bin/dbConnection.js');
 
 let serverConfig = require('./server/config/dbConfig');

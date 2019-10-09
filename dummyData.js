@@ -108,6 +108,7 @@ let create = () => {
     //Hospital
     Hospital.create({
         id: "H1",
+        password: "password",
         location: {
             type: "Point",
             coordinates: [
@@ -115,7 +116,6 @@ let create = () => {
                 98.72
             ]
         },
-
     });
 
     //Vechile

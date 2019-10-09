@@ -54,30 +54,36 @@ driverController.addVehicle = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
         if (error) RESPONSE.send(error);
-        else {
+        else if (driver) {
             var owner_license_no = driver.license_no;
             Vehicle.findOne({
                 registration_no,
                 chasis_number
             }, (error, vehicle) => {
                 if (error) RESPONSE.send(error);
-                else {
+                else if (vehicle) {
                     vehicle.addOwner(owner_license_no, (error, doc) => {
                         if (error) RESPONSE.send(error);
                         else RESPONSE.send(doc);
                     });
-                }
+                } else RESPONSE.send({
+                    'error': 'Vehicle not found'
+                });
             })
-        }
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
     });
 };
 driverController.details = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
         if (error) RESPONSE.send(error);
-        else {
+        else if (driver) {
             RESPONSE.send(driver);
-        }
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
     });
 };
 driverController.modifyMedical = (REQUEST, RESPONSE) => {
@@ -85,13 +91,15 @@ driverController.modifyMedical = (REQUEST, RESPONSE) => {
     var medical = REQUEST.body.medical;
     Driver.findByAuthToken(token, (error, driver) => {
         if (error) RESPONSE.send(error);
-        else {
+        else if (driver) {
             driver.medical = medical;
             driver.save((error, driver, numbersAffected) => {
                 if (error) RESPONSE.send(error);
                 else RESPONSE.send(driver);
             });
-        }
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
     });
 };
 driverController.sos = (REQUEST, RESPONSE) => {
@@ -100,7 +108,7 @@ driverController.sos = (REQUEST, RESPONSE) => {
     var lat = REQUEST.body.location_of_accident.lat;
     Driver.findByAuthToken(token, (error, driver) => {
         if (error) RESPONSE.send(error);
-        else {
+        else if (driver) {
             var report = new Report({
                 date: Date.now(),
                 reporter: {
@@ -130,7 +138,9 @@ driverController.sos = (REQUEST, RESPONSE) => {
                 if (error) RESPONSE.send(error);
                 else RESPONSE.send(report);
             });
-        }
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
     });
 };
 driverController.emergency = (REQUEST, RESPONSE) => {
@@ -141,17 +151,17 @@ driverController.emergency = (REQUEST, RESPONSE) => {
     var description = REQUEST.body.description;
     Driver.findByAuthToken(token, (error, reporter) => {
         if (error) RESPONSE.send(error);
-        else {
+        else if (reporter) {
             Vehicle.findOne({
                 registration_no: registration_no
             }, (error, vehicle) => {
                 if (error) RESPONSE.send(error);
-                else {
+                else if (vehicle) {
                     Driver.findOne({
                         license_no: vehicle.driver_license_no || vehicle.owner_license_no
                     }, (error, victim) => {
                         if (error) RESPONSE.send(error);
-                        else {
+                        else if (victim) {
                             var report = new Report({
                                 date: Date.now(),
                                 reporter: {
@@ -181,11 +191,17 @@ driverController.emergency = (REQUEST, RESPONSE) => {
                                 if (error) RESPONSE.send(error);
                                 else RESPONSE.send(report);
                             });
-                        }
+                        } else RESPONSE.send({
+                            'error': 'Victim not found'
+                        });
                     });
-                }
+                } else RESPONSE.send({
+                    'error': 'Driver not found'
+                });
             })
-        }
+        } else RESPONSE.send({
+            'error': 'Reporter not found'
+        });
     });
 };
 

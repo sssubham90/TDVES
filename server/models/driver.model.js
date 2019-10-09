@@ -121,16 +121,15 @@ driverSchema.methods.verifyOtp = function(otp, fn) {
     sendOtp.verify(this.phone, otp, fn);
 }
 
-driverSchema.statics.findByAuthToken = (token, fn) => {
+driverSchema.statics.findByAuthToken = function(token, fn) {
     var decoded;
-    var Driver = mongoose.model('driver', driverSchema);
     try {
         decoded = jwt.verify(token, 'devil');
     } catch (e) {
         fn(e, null);
     }
 
-    Driver.findOne({
+    this.findOne({
         _id: decoded._id,
         'tokens.token': token,
         'tokens.access': 'auth'
