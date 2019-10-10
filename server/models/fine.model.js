@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-
 const fineSchema = new mongoose.Schema({
-
     driver_license_no: {
         type: String,
         trim: true,
@@ -11,11 +9,6 @@ const fineSchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: [true, 'Vehicle registration no. required']
-    },
-    type: {
-        type: String,
-        enum: ["driver", "vehicle"],
-        required: [true, 'Fine type required']
     },
     date: {
         type: Date,
@@ -34,7 +27,7 @@ const fineSchema = new mongoose.Schema({
     },
     fine_details: [{
         rule: String,
-        fine_amt: Number
+        fine: Number,
     }]
 });
 

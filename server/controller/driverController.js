@@ -1,19 +1,19 @@
 let driverController = {};
-let Driver = require("../models/driver.model");
-let Vehicle = require("../models/vehicle.model");
-let Report = require("../models/report.model");
+let Driver = require('../models/driver.model');
+let Vehicle = require('../models/vehicle.model');
+let Report = require('../models/report.model');
 
 driverController.login = (REQUEST, RESPONSE) => {
     var license_no = REQUEST.query.license_no;
     Driver.findOne({
-            license_no: license_no
+            license_no
         },
         function(err, driver) {
             if (err) {
                 RESPONSE.send(err);
             } else if (driver) {
-                driver.sendOtp((error, driver) => {
-                    RESPONSE.send(driver);
+                driver.sendOtp((error, data) => {
+                    RESPONSE.send(data);
                 });
             } else {
                 RESPONSE.send({
@@ -26,7 +26,7 @@ driverController.verifyOTP = (REQUEST, RESPONSE) => {
     var license_no = REQUEST.query.license_no;
     var otp = REQUEST.query.otp;
     Driver.findOne({
-            license_no: license_no
+            license_no
         },
         function(err, driver) {
             if (err) {
@@ -153,7 +153,7 @@ driverController.emergency = (REQUEST, RESPONSE) => {
         if (error) RESPONSE.send(error);
         else if (reporter) {
             Vehicle.findOne({
-                registration_no: registration_no
+                registration_no
             }, (error, vehicle) => {
                 if (error) RESPONSE.send(error);
                 else if (vehicle) {
@@ -196,7 +196,7 @@ driverController.emergency = (REQUEST, RESPONSE) => {
                         });
                     });
                 } else RESPONSE.send({
-                    'error': 'Driver not found'
+                    'error': 'Vehicle not found'
                 });
             })
         } else RESPONSE.send({

@@ -13,7 +13,8 @@ const hospitalSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        trim: true,
+        required: [true, 'Password is required'],
         minlength: 6
     },
     location: {
@@ -69,6 +70,7 @@ hospitalSchema.methods.authenticate = function(password, fn) {
 
 hospitalSchema.methods.setPassword = function(password, fn) {
     this.password = password;
+    this.token
     this.save(fn);
 }
 

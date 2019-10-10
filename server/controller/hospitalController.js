@@ -60,18 +60,18 @@ hospitalController.emergency = (REQUEST, RESPONSE) => {
         if (error) RESPONSE.send(error);
         else if (hospital) {
             Report.find({
-                location: {
+                location_of_accident: {
                     $near: {
                         $maxDistance: 1000, //in metres
                         $geometry: {
-                            type: "Point",
-                            coordinates: [hospital.location.coordinates[0], hospital.location.coordinates[1]]
+                            type: hospital.location.type,
+                            coordinates: hospital.location.coordinates
                         }
                     }
                 }
             }, (error, results) => {
                 if (error) RESPONSE.send(error);
-                else RESPONSE.send(JSON.stringify(results));
+                else RESPONSE.send((results));
             });
         } else RESPONSE.send({
             'error': 'Hospital not found'

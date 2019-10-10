@@ -95,12 +95,12 @@ let create = () => {
     //Officer
     Officer.create({
         id: "124",
-        password: "abcd",
+        password: "abcdef",
         location: {
             type: "Point",
             coordinates: [
-                93.47,
-                98.52
+                85.847755,
+                20.287210
             ]
         },
     });
@@ -112,8 +112,8 @@ let create = () => {
         location: {
             type: "Point",
             coordinates: [
-                94.67,
-                98.72
+                85.847755,
+                20.287210
             ]
         },
     });

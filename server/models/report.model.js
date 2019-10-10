@@ -117,7 +117,6 @@ const reportSchema = new mongoose.Schema({
     hospital: {
         id: {
             type: String,
-            unique: true,
             trim: true,
         },
         location: {
@@ -130,6 +129,10 @@ const reportSchema = new mongoose.Schema({
             }
         },
     }
+});
+
+reportSchema.index({
+    location_of_accident: "2dsphere"
 });
 
 module.exports = mongoose.model('report', reportSchema);
