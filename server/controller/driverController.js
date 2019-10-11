@@ -2,6 +2,7 @@ let driverController = {};
 let Driver = require('../models/driver.model');
 let Vehicle = require('../models/vehicle.model');
 let Report = require('../models/report.model');
+let Request = require('../models/request.model');
 
 driverController.login = (REQUEST, RESPONSE) => {
     var license_no = REQUEST.query.license_no;
@@ -55,16 +56,59 @@ driverController.addVehicle = (REQUEST, RESPONSE) => {
     Driver.findByAuthToken(token, (error, driver) => {
         if (error) RESPONSE.send(error);
         else if (driver) {
-            var owner_license_no = driver.license_no;
             Vehicle.findOne({
                 registration_no,
                 chasis_number
             }, (error, vehicle) => {
                 if (error) RESPONSE.send(error);
                 else if (vehicle) {
-                    vehicle.addOwner(owner_license_no, (error, doc) => {
-                        if (error) RESPONSE.send(error);
-                        else RESPONSE.send(doc);
+                    if (vehicle.owner_license_no == null)
+                        vehicle.addOwner(driver.license_no, driver.name, (error, vehicle) => {
+                            if (error) RESPONSE.send(error);
+                            else if (vehicle) {
+                                driver.addVehicle(registration_no, (error, driver) => {
+                                    if (error) RESPONSE.send(error);
+                                    else RESPONSE.send(driver);
+                                });
+                            }
+                        });
+                    else RESPONSE.send({
+                        'error': 'Owner already exists'
+                    });
+                } else RESPONSE.send({
+                    'error': 'Vehicle not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+};
+driverController.removeVehicle = (REQUEST, RESPONSE) => {
+    var registration_no = REQUEST.query.registration_no;
+    var chasis_number = REQUEST.query.chasis_number;
+    var token = REQUEST.header('x-auth');
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Vehicle.findOne({
+                registration_no,
+                chasis_number
+            }, (error, vehicle) => {
+                if (error) RESPONSE.send(error);
+                else if (vehicle) {
+                    if (vehicle.owner_license_no == driver.license_no)
+                        vehicle.removeOwner((error, vehicle) => {
+                            if (error) RESPONSE.send(error);
+                            else if (vehicle) {
+                                driver.removeVehicle(registration_no, (error, driver) => {
+                                    if (error) RESPONSE.send(error);
+                                    else RESPONSE.send(driver);
+                                });
+                            }
+                        });
+                    else RESPONSE.send({
+                        'error': 'You are not authorized to make this change.'
                     });
                 } else RESPONSE.send({
                     'error': 'Vehicle not found'
@@ -204,5 +248,185 @@ driverController.emergency = (REQUEST, RESPONSE) => {
         });
     });
 };
+
+driverController.listVehicles = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Vehicle.find({
+                'registration_no': {
+                    $in: driver.vehicles
+                }
+            }, (error, vehicles) => {
+                if (error) RESPONSE.send(error);
+                else if (vehicles) RESPONSE.send(vehicles);
+                else RESPONSE.send({
+                    'error': 'Vehicles not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
+driverController.listVehicleRequest = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Request.find({
+                owner_license_no: driver.license_no
+            }, (error, requests) => {
+                if (error) RESPONSE.send(error);
+                else if (requests) RESPONSE.send(requests);
+                else RESPONSE.send({
+                    'error': 'No requests found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
+driverController.sendVehicleRequest = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    var registration_no = REQUEST.query.registration_no;
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Vehicle.findOne({
+                registration_no
+            }, (error, vehicle) => {
+                if (error) RESPONSE.send(error);
+                else if (vehicle) {
+                    var request = new Request({
+                        owner_license_no: vehicle.owner_license_no,
+                        driver_license_no: driver.license_no,
+                        vehicle_registration_no: registration_no,
+                        date: Date.now()
+                    });
+                    request.save((error, request) => {
+                        if (error) RESPONSE.send(error);
+                        else RESPONSE.send(request);
+                    });
+                } else RESPONSE.send({
+                    'error': 'Vehicle not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
+driverController.acceptVehicleRequest = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    var id = REQUEST.query.id;
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Request.findById(id, (error, request) => {
+                if (error) RESPONSE.send(error);
+                else if (request) {
+                    if (request.status == null) {
+                        request.status = 'Accepted';
+                        var registration_no = request.vehicle_registration_no;
+                        Vehicle.findOne({
+                            registration_no
+                        }, (error, vehicle) => {
+                            if (error) RESPONSE.send(error);
+                            else if (vehicle) {
+                                vehicle.driver_license_no = request.driver_license_no;
+                                vehicle.save((error, vehicle) => {
+                                    if (error) RESPONSE.send(error);
+                                    else if (vehicle) request.save((error, request) => {
+                                        if (error) RESPONSE.send(error);
+                                        else RESPONSE.send(request);
+                                    });
+                                });
+                            } else RESPONSE.send({
+                                'error': 'Vehicle not found'
+                            });
+                        });
+                    } else RESPONSE.send({
+                        'error': 'Illegal request status transition'
+                    });
+                } else RESPONSE.send({
+                    'error': 'Request not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
+driverController.rejectVehicleRequest = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    var id = REQUEST.query.id;
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Request.findById(id, (error, request) => {
+                if (error) RESPONSE.send(error);
+                else if (request) {
+                    if (request.status == null) {
+                        request.status = 'Rejected';
+                        request.save((error, request) => {
+                            if (error) RESPONSE.send(error);
+                            else RESPONSE.send(request);
+                        });
+                    } else RESPONSE.send({
+                        'error': 'Illegal request status transition'
+                    });
+                } else RESPONSE.send({
+                    'error': 'Request not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
+driverController.cancelVehicleLending = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    var id = REQUEST.query.id;
+    Driver.findByAuthToken(token, (error, driver) => {
+        if (error) RESPONSE.send(error);
+        else if (driver) {
+            Request.findById(id, (error, request) => {
+                if (error) RESPONSE.send(error);
+                else if (request) {
+                    if (request.status == 'Accepted') {
+                        request.status = 'Canceled';
+                        var registration_no = request.vehicle_registration_no;
+                        Vehicle.findOne({
+                            registration_no
+                        }, (error, vehicle) => {
+                            if (error) RESPONSE.send(error);
+                            else if (vehicle) {
+                                vehicle.driver_license_no = null;
+                                vehicle.save((error, vehicle) => {
+                                    if (error) RESPONSE.send(error);
+                                    else if (vehicle) request.save((error, request) => {
+                                        if (error) RESPONSE.send(error);
+                                        else RESPONSE.send(request);
+                                    });
+                                });
+                            } else RESPONSE.send({
+                                'error': 'Vehicle not found'
+                            });
+                        });
+                    } else RESPONSE.send({
+                        'error': 'Illegal request status transition'
+                    });
+                } else RESPONSE.send({
+                    'error': 'Request not found'
+                });
+            });
+        } else RESPONSE.send({
+            'error': 'Driver not found'
+        });
+    });
+}
 
 module.exports = driverController;

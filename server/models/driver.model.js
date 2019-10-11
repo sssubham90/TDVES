@@ -52,6 +52,11 @@ const driverSchema = new mongoose.Schema({
         trim: true,
         required: [true, 'Driver address required']
     },
+    vehicles: [{
+        type: String,
+        trim: true,
+        required: [true, 'Registration no. required']
+    }],
     medical: {
         blood_group: {
             type: String,
@@ -121,6 +126,20 @@ driverSchema.methods.verifyOtp = function(otp, fn) {
     sendOtp.verify(this.phone, otp, fn);
 }
 
+driverSchema.methods.addVehicle = function(registration_no, fn) {
+    this.vehicles.push(registration_no);
+    this.save(function(err, doc, numbersAffected) {
+        fn(err, doc);
+    });
+}
+
+driverSchema.methods.removeVehicle = function(registration_no, fn) {
+    this.vehicles.pull(registration_no);
+    this.save(function(err, doc, numbersAffected) {
+        fn(err, doc);
+    });
+}
+
 driverSchema.statics.findByAuthToken = function(token, fn) {
     var decoded;
     try {
@@ -128,7 +147,6 @@ driverSchema.statics.findByAuthToken = function(token, fn) {
     } catch (e) {
         fn(e, null);
     }
-
     this.findOne({
         _id: decoded._id,
         'tokens.token': token,
