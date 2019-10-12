@@ -3,7 +3,7 @@ let officerController = require("../controller/officerController");
 module.exports = (APP) => {
 
     APP.route('/api/officer/login')
-        .get(officerController.login);
+        .post(officerController.login);
     APP.route('/api/officer/changePassword')
         .put(officerController.changePassword);
     APP.route('/api/officer/emergency')
