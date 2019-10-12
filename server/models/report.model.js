@@ -118,6 +118,7 @@ const reportSchema = new mongoose.Schema({
         id: {
             type: String,
             trim: true,
+            default: null
         },
         location: {
             type: {

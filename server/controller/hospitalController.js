@@ -68,7 +68,8 @@ hospitalController.emergency = (REQUEST, RESPONSE) => {
                             coordinates: hospital.location.coordinates
                         }
                     }
-                }
+                },
+                'hospital.id': null
             }, (error, results) => {
                 if (error) RESPONSE.send(error);
                 else RESPONSE.send((results));
@@ -88,11 +89,15 @@ hospitalController.confirmEmergency = (REQUEST, RESPONSE) => {
             Report.findById(report_id, (error, report) => {
                 if (error) RESPONSE.send(error);
                 else if (report) {
-                    report.hospital.id = hospital.id;
-                    report.hospital.location = hospital.location;
-                    report.save((error, report, numbersAffected) => {
-                        if (error) RESPONSE.send(error);
-                        else RESPONSE.send(report);
+                    if (report.hospital.id == null) {
+                        report.hospital.id = hospital.id;
+                        report.hospital.location = hospital.location;
+                        report.save((error, report, numbersAffected) => {
+                            if (error) RESPONSE.send(error);
+                            else RESPONSE.send(report);
+                        });
+                    } else RESPONSE.send({
+                        'error': 'Report has already been confirmed.'
                     });
                 } else RESPONSE.send({
                     'error': 'Report not found'
@@ -104,5 +109,21 @@ hospitalController.confirmEmergency = (REQUEST, RESPONSE) => {
     });
 };
 
+hospitalController.hospitalEmergency = (REQUEST, RESPONSE) => {
+    var token = REQUEST.header('x-auth');
+    Hospital.findByAuthToken(token, (error, hospital) => {
+        if (error) RESPONSE.send(error);
+        else if (hospital) {
+            Report.find({
+                'hospital.id': hospital.id
+            }, (error, results) => {
+                if (error) RESPONSE.send(error);
+                else RESPONSE.send((results));
+            });
+        } else RESPONSE.send({
+            'error': 'Hospital not found'
+        });
+    });
+};
 
 module.exports = hospitalController;

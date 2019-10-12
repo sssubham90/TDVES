@@ -10,5 +10,7 @@ module.exports = (APP) => {
         .get(hospitalController.emergency);
     APP.route('/api/hospital/confirmEmergency')
         .put(hospitalController.confirmEmergency);
+    APP.route('/api/hospital/hospitalEmergency')
+        .get(hospitalController.hospitalEmergency);
 
 };
