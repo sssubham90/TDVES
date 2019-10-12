@@ -40,6 +40,12 @@ require('../server/routes/driverRoutes')(app);
 require('../server/routes/officerRoutes')(app);
 require('../server/routes/hospitalRoutes')(app);
 
+/********************************
+ ****** welcome to tdves api ****
+ ********************************/
+app.route('/api/').get((REQUEST, RESPONSE) => {
+    RESPONSE.send("Welcome to TDVES");
+});
 
 /** server listening */
 module.exports = () => {
