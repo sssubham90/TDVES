@@ -144,6 +144,10 @@ officerController.listFines = (REQUEST, RESPONSE) => {
             fine: 2000
         },
         {
+            rule: "Driving without wearing seat belt",
+            fine: 1000
+        },
+        {
             rule: "Drunken Driving",
             fine: 10000
         },
@@ -156,11 +160,7 @@ officerController.listFines = (REQUEST, RESPONSE) => {
             fine: 500
         },
         {
-            rule: "Driving without wearing seat belt",
-            fine: 1000
-        },
-        {
-            rule: "invalid license",
+            rule: "Invalid license",
             fine: 2000
         },
         {
