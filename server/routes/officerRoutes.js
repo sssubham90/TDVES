@@ -10,6 +10,8 @@ module.exports = (APP) => {
         .post(officerController.emergency);
     APP.route('/api/officer/vehicleDetails')
         .get(officerController.vehicleDetails);
+    APP.route('/api/officer/listFines')
+        .get(officerController.listFines);
     APP.route('/api/officer/chargeChallan')
         .post(officerController.chargeChallan);
 

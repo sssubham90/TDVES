@@ -138,6 +138,41 @@ officerController.vehicleDetails = (REQUEST, RESPONSE) => {
     });
 
 };
+officerController.listFines = (REQUEST, RESPONSE) => {
+    RESPONSE.send([{
+            rule: "Driving without helmet",
+            fine: 2000
+        },
+        {
+            rule: "Drunken Driving",
+            fine: 10000
+        },
+        {
+            rule: "Driving without license",
+            fine: 5000
+        },
+        {
+            rule: "Overspeeding",
+            fine: 500
+        },
+        {
+            rule: "Driving without wearing seat belt",
+            fine: 1000
+        },
+        {
+            rule: "invalid license",
+            fine: 2000
+        },
+        {
+            rule: "Diving without PUC certificate or with invalid PUC certificate",
+            fine: 1000
+        },
+        {
+            rule: "Diving without insurance or with invalid insurance",
+            fine: 1500
+        }
+    ]);
+}
 officerController.chargeChallan = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var vehicle_registration_no = REQUEST.body.vehicle_registration_no;

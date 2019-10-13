@@ -37,43 +37,6 @@ let create = () => {
         if (err) console.log(err);
     });
 
-
-    //FineDetail
-    /*
-    FineDetail.create({
-        rule: "Driving without helmet",
-        fine: 2000
-    });
-    FineDetail.create({
-        rule: "Drunken Driving",
-        fine: 10000
-    });
-    FineDetail.create({
-        rule: "Driving without license",
-        fine: 5000
-    });
-    FineDetail.create({
-        rule: "Overspeeding",
-        fine: 500
-    });
-    FineDetail.create({
-        rule: "Driving without wearing seat belt",
-        fine: 1000
-    });
-    FineDetail.create({
-        rule: "invalid license",
-        fine: 2000
-    });
-    FineDetail.create({
-        rule: "Diving without PUC certificate or with invalid PUC certificate",
-        fine: 1000
-    });
-    FineDetail.create({
-        rule: "Diving without insurance or with invalid insurance",
-        fine: 1500
-    });
-    */
-
     //license
     License.create({
         license_no: '1234567',
