@@ -12,20 +12,28 @@ officerController.login = (REQUEST, RESPONSE) => {
     Officer.findOne({
         id
     }, (error, officer) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (officer) {
             officer.authenticate(password, (error, result) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (result == true) {
-                    officer.generateAuthToken((err, officer, token) => {
-                        if (err) RESPONSE.send(err);
-                        else RESPONSE.header('x-auth', token).send(officer);
+                    officer.generateAuthToken((error, officer, token) => {
+                        if (err) RESPONSE.status(500).send({
+                            'error': error
+                        });
+                        else RESPONSE.status(200).header('x-auth', token).send({
+                            'msg': officer
+                        });
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'msg': 'Incorrect Password'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Officer not found'
         });
     });
@@ -35,23 +43,29 @@ officerController.changePassword = (REQUEST, RESPONSE) => {
     var oldPassword = REQUEST.body.oldPassword;
     var newPassword = REQUEST.body.newPassword;
     Officer.findByAuthToken(token, (error, officer) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (officer) {
             officer.authenticate(oldPassword, (error, result) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (result == true) {
-                    officer.setPassword(newPassword, (error, officer, numbersAffected) => {
-                        if (error) RESPONSE.send(error);
-                        else RESPONSE.send({
+                    officer.setPassword(newPassword, (error, officer) => {
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
+                        });
+                        else RESPONSE.status(200).send({
                             'msg': 'Password changed successfully',
                             officer
                         });
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'msg': 'Incorrect Password'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Officer not found'
         });
     });
@@ -63,17 +77,23 @@ officerController.emergency = (REQUEST, RESPONSE) => {
     var registration_no = REQUEST.body.registration_no;
     var description = REQUEST.body.description;
     Officer.findByAuthToken(token, (error, reporter) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (reporter) {
             Vehicle.findOne({
                 registration_no
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     Driver.findOne({
                         license_no: vehicle.driver_license_no || vehicle.owner_license_no
                     }, (error, victim) => {
-                        if (error) RESPONSE.send(error);
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
+                        });
                         else if (victim) {
                             var report = new Report({
                                 date: Date.now(),
@@ -101,18 +121,22 @@ officerController.emergency = (REQUEST, RESPONSE) => {
                                 },
                             });
                             report.save((error, report) => {
-                                if (error) RESPONSE.send(error);
-                                else RESPONSE.send(report);
+                                if (error) RESPONSE.status(500).send({
+                                    'error': error
+                                });
+                                else RESPONSE.status(200).send({
+                                    'msg': report
+                                });
                             });
-                        } else RESPONSE.send({
+                        } else RESPONSE.status(400).send({
                             'error': 'Victim not found'
                         });
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Reporter not found'
         });
     });
@@ -121,57 +145,65 @@ officerController.vehicleDetails = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var registration_no = REQUEST.query.registration_no;
     Officer.findByAuthToken(token, (error, officer) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (officer) {
             Vehicle.findOne({
                 registration_no
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
-                else if (vehicle) RESPONSE.send(vehicle);
-                else RESPONSE.send({
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else if (vehicle) RESPONSE.status(200).send({
+                    'msg': vehicle
+                });
+                else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             })
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Officer not found'
         });
     });
 
 };
 officerController.listFines = (REQUEST, RESPONSE) => {
-    RESPONSE.send([{
-            rule: "Driving without helmet",
-            fine: 2000
-        },
-        {
-            rule: "Driving without wearing seat belt",
-            fine: 1000
-        },
-        {
-            rule: "Drunken Driving",
-            fine: 10000
-        },
-        {
-            rule: "Driving without license",
-            fine: 5000
-        },
-        {
-            rule: "Overspeeding",
-            fine: 500
-        },
-        {
-            rule: "Invalid license",
-            fine: 2000
-        },
-        {
-            rule: "Diving without PUC certificate or with invalid PUC certificate",
-            fine: 1000
-        },
-        {
-            rule: "Diving without insurance or with invalid insurance",
-            fine: 1500
-        }
-    ]);
+    RESPONSE.status(200).send({
+        'msg': [{
+                rule: "Driving without helmet",
+                fine: 2000
+            },
+            {
+                rule: "Driving without wearing seat belt",
+                fine: 1000
+            },
+            {
+                rule: "Drunken Driving",
+                fine: 10000
+            },
+            {
+                rule: "Driving without license",
+                fine: 5000
+            },
+            {
+                rule: "Overspeeding",
+                fine: 500
+            },
+            {
+                rule: "Invalid license",
+                fine: 2000
+            },
+            {
+                rule: "Diving without PUC certificate or with invalid PUC certificate",
+                fine: 1000
+            },
+            {
+                rule: "Diving without insurance or with invalid insurance",
+                fine: 1500
+            }
+        ]
+    });
 }
 officerController.chargeChallan = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
@@ -181,12 +213,16 @@ officerController.chargeChallan = (REQUEST, RESPONSE) => {
     var fine_details = REQUEST.body.fine_details;
     var date = Date.now();
     Officer.findByAuthToken(token, (error, officer) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (officer) {
             Vehicle.findOne({
                 registration_no: vehicle_registration_no
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     var driver_license_no = vehicle.driver_license_no || vehicle.owner_license_no;
                     if (geolocation.distanceTo(officer.location.coordinates, [long, lat]) < 100) {
@@ -204,17 +240,21 @@ officerController.chargeChallan = (REQUEST, RESPONSE) => {
                             fine_details
                         });
                         fine.save((error, fine) => {
-                            if (error) RESPONSE.send(fine);
-                            else RESPONSE.send(fine);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
+                            else RESPONSE.status(200).send({
+                                'msg': fine
+                            });
                         });
-                    } else RESPONSE.send({
+                    } else RESPONSE.status(400).send({
                         'error': 'Officer out of duty area...'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Officer not found'
         });
     });

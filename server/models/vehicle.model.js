@@ -101,7 +101,7 @@ const vehicleSchema = new mongoose.Schema({
 vehicleSchema.methods.addOwner = function(license_no, name, fn) {
     this.owner_license_no = license_no;
     this.owner_name = name;
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc);
     });
 }
@@ -109,7 +109,7 @@ vehicleSchema.methods.addOwner = function(license_no, name, fn) {
 vehicleSchema.methods.removeOwner = function(fn) {
     this.owner_license_no = null;
     this.owner_name = null;
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc);
     });
 }

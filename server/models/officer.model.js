@@ -74,7 +74,7 @@ officerSchema.methods.generateAuthToken = function(fn) {
         access,
         token
     });
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc, token);
     });
 }

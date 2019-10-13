@@ -9,15 +9,20 @@ driverController.login = (REQUEST, RESPONSE) => {
     Driver.findOne({
             license_no
         },
-        function(err, driver) {
-            if (err) {
-                RESPONSE.send(err);
+        function(error, driver) {
+            if (error) {
+                RESPONSE.status(500).send({
+                    'error': error
+                });
             } else if (driver) {
                 driver.sendOtp((error, data) => {
-                    RESPONSE.send(data);
+                    RESPONSE.status(200).send({
+                        'msg': 'Success',
+                        data
+                    });
                 });
             } else {
-                RESPONSE.send({
+                RESPONSE.status(400).send({
                     'error': 'Driver not found'
                 });
             }
@@ -29,21 +34,31 @@ driverController.verifyOTP = (REQUEST, RESPONSE) => {
     Driver.findOne({
             license_no
         },
-        function(err, driver) {
-            if (err) {
-                RESPONSE.send(err);
+        function(error, driver) {
+            if (error) {
+                RESPONSE.status(500).send({
+                    'error': error
+                });
             } else if (driver) {
                 driver.verifyOtp(otp, (error, data) => {
-                    if (data.type == 'success' || true) {
+                    if (data.type == 'success') {
+                        driver.generateAuthToken((error, driver, token) => {
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
+                            else RESPONSE.status(200).header('x-auth', token).send({
+                                'msg': driver
+                            });
+                        });
+                    } else {
                         console.log(data);
-                        driver.generateAuthToken((err, driver, token) => {
-                            if (err) RESPONSE.send(err);
-                            else RESPONSE.header('x-auth', token).send(driver);
+                        RESPONSE.status(500).send({
+                            'error': error
                         });
                     }
                 });
             } else {
-                RESPONSE.send({
+                RESPONSE.status(400).send({
                     'error': 'Driver not found'
                 });
             }
@@ -54,32 +69,42 @@ driverController.addVehicle = (REQUEST, RESPONSE) => {
     var chasis_number = REQUEST.query.chasis_number;
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Vehicle.findOne({
                 registration_no,
                 chasis_number
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     if (vehicle.owner_license_no == null)
                         vehicle.addOwner(driver.license_no, driver.name, (error, vehicle) => {
-                            if (error) RESPONSE.send(error);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
                             else if (vehicle) {
                                 driver.addVehicle(registration_no, (error, driver) => {
-                                    if (error) RESPONSE.send(error);
-                                    else RESPONSE.send(driver);
+                                    if (error) RESPONSE.status(500).send({
+                                        'error': error
+                                    });
+                                    else RESPONSE.status(200).send({
+                                        'msg': driver
+                                    });
                                 });
                             }
                         });
-                    else RESPONSE.send({
+                    else RESPONSE.status(400).send({
                         'error': 'Owner already exists'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -89,32 +114,42 @@ driverController.removeVehicle = (REQUEST, RESPONSE) => {
     var chasis_number = REQUEST.query.chasis_number;
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Vehicle.findOne({
                 registration_no,
                 chasis_number
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     if (vehicle.owner_license_no == driver.license_no)
                         vehicle.removeOwner((error, vehicle) => {
-                            if (error) RESPONSE.send(error);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
                             else if (vehicle) {
                                 driver.removeVehicle(registration_no, (error, driver) => {
-                                    if (error) RESPONSE.send(error);
-                                    else RESPONSE.send(driver);
+                                    if (error) RESPONSE.status(500).send({
+                                        'error': error
+                                    });
+                                    else RESPONSE.status(200).send({
+                                        'msg': driver
+                                    });
                                 });
                             }
                         });
-                    else RESPONSE.send({
+                    else RESPONSE.status(400).send({
                         'error': 'You are not authorized to make this change.'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             })
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -122,10 +157,14 @@ driverController.removeVehicle = (REQUEST, RESPONSE) => {
 driverController.details = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
-            RESPONSE.send(driver);
-        } else RESPONSE.send({
+            RESPONSE.status(200).send({
+                'msg': driver
+            });
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -134,14 +173,20 @@ driverController.modifyMedical = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var medical = REQUEST.body.medical;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             driver.medical = medical;
-            driver.save((error, driver, numbersAffected) => {
-                if (error) RESPONSE.send(error);
-                else RESPONSE.send(driver);
+            driver.save((error, driver) => {
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else RESPONSE.status(200).send({
+                    'msg': driver
+                });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -151,7 +196,9 @@ driverController.sos = (REQUEST, RESPONSE) => {
     var long = REQUEST.body.location_of_accident.long;
     var lat = REQUEST.body.location_of_accident.lat;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             var report = new Report({
                 date: Date.now(),
@@ -179,10 +226,14 @@ driverController.sos = (REQUEST, RESPONSE) => {
                 },
             });
             report.save((error, report) => {
-                if (error) RESPONSE.send(error);
-                else RESPONSE.send(report);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else RESPONSE.status(200).send({
+                    'msg': report
+                });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -194,17 +245,23 @@ driverController.emergency = (REQUEST, RESPONSE) => {
     var registration_no = REQUEST.body.registration_no;
     var description = REQUEST.body.description;
     Driver.findByAuthToken(token, (error, reporter) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (reporter) {
             Vehicle.findOne({
                 registration_no
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     Driver.findOne({
                         license_no: vehicle.driver_license_no || vehicle.owner_license_no
                     }, (error, victim) => {
-                        if (error) RESPONSE.send(error);
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
+                        });
                         else if (victim) {
                             var report = new Report({
                                 date: Date.now(),
@@ -232,18 +289,22 @@ driverController.emergency = (REQUEST, RESPONSE) => {
                                 },
                             });
                             report.save((error, report) => {
-                                if (error) RESPONSE.send(error);
-                                else RESPONSE.send(report);
+                                if (error) RESPONSE.status(500).send({
+                                    'error': error
+                                });
+                                else RESPONSE.status(200).send({
+                                    'msg': report
+                                });
                             });
-                        } else RESPONSE.send({
+                        } else RESPONSE.status(400).send({
                             'error': 'Victim not found'
                         });
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             })
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Reporter not found'
         });
     });
@@ -252,20 +313,26 @@ driverController.emergency = (REQUEST, RESPONSE) => {
 driverController.listVehicles = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Vehicle.find({
                 'registration_no': {
                     $in: driver.vehicles
                 }
             }, (error, vehicles) => {
-                if (error) RESPONSE.send(error);
-                else if (vehicles) RESPONSE.send(vehicles);
-                else RESPONSE.send({
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else if (vehicles) RESPONSE.status(200).send({
+                    'msg': vehicles
+                });
+                else RESPONSE.status(400).send({
                     'error': 'Vehicles not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -273,18 +340,24 @@ driverController.listVehicles = (REQUEST, RESPONSE) => {
 driverController.listVehicleRequest = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Request.find({
                 owner_license_no: driver.license_no
             }, (error, requests) => {
-                if (error) RESPONSE.send(error);
-                else if (requests) RESPONSE.send(requests);
-                else RESPONSE.send({
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else if (requests) RESPONSE.status(200).send({
+                    'msg': requests
+                });
+                else RESPONSE.status(400).send({
                     'error': 'No requests found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -293,12 +366,16 @@ driverController.sendVehicleRequest = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var registration_no = REQUEST.query.registration_no;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Vehicle.findOne({
                 registration_no
             }, (error, vehicle) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (vehicle) {
                     var request = new Request({
                         owner_license_no: vehicle.owner_license_no,
@@ -307,14 +384,18 @@ driverController.sendVehicleRequest = (REQUEST, RESPONSE) => {
                         date: Date.now()
                     });
                     request.save((error, request) => {
-                        if (error) RESPONSE.send(error);
-                        else RESPONSE.send(request);
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
+                        });
+                        else RESPONSE.status(200).send({
+                            'msg': request
+                        });
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -323,10 +404,14 @@ driverController.acceptVehicleRequest = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var id = REQUEST.query.id;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Request.findById(id, (error, request) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (request) {
                     if (request.status == null) {
                         request.status = 'Accepted';
@@ -334,28 +419,36 @@ driverController.acceptVehicleRequest = (REQUEST, RESPONSE) => {
                         Vehicle.findOne({
                             registration_no
                         }, (error, vehicle) => {
-                            if (error) RESPONSE.send(error);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
                             else if (vehicle) {
                                 vehicle.driver_license_no = request.driver_license_no;
                                 vehicle.save((error, vehicle) => {
-                                    if (error) RESPONSE.send(error);
+                                    if (error) RESPONSE.status(500).send({
+                                        'error': error
+                                    });
                                     else if (vehicle) request.save((error, request) => {
-                                        if (error) RESPONSE.send(error);
-                                        else RESPONSE.send(request);
+                                        if (error) RESPONSE.status(500).send({
+                                            'error': error
+                                        });
+                                        else RESPONSE.status(200).send({
+                                            'msg': request
+                                        });
                                     });
                                 });
-                            } else RESPONSE.send({
+                            } else RESPONSE.status(400).send({
                                 'error': 'Vehicle not found'
                             });
                         });
-                    } else RESPONSE.send({
+                    } else RESPONSE.status(400).send({
                         'error': 'Illegal request status transition'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Request not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -364,25 +457,33 @@ driverController.rejectVehicleRequest = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var id = REQUEST.query.id;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Request.findById(id, (error, request) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (request) {
                     if (request.status == null) {
                         request.status = 'Rejected';
                         request.save((error, request) => {
-                            if (error) RESPONSE.send(error);
-                            else RESPONSE.send(request);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
+                            else RESPONSE.status(200).send({
+                                'msg': request
+                            });
                         });
-                    } else RESPONSE.send({
+                    } else RESPONSE.status(400).send({
                         'error': 'Illegal request status transition'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Request not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });
@@ -391,10 +492,14 @@ driverController.cancelVehicleLending = (REQUEST, RESPONSE) => {
     var token = REQUEST.header('x-auth');
     var id = REQUEST.query.id;
     Driver.findByAuthToken(token, (error, driver) => {
-        if (error) RESPONSE.send(error);
+        if (error) RESPONSE.status(500).send({
+            'error': error
+        });
         else if (driver) {
             Request.findById(id, (error, request) => {
-                if (error) RESPONSE.send(error);
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
                 else if (request) {
                     if (request.status == 'Accepted') {
                         request.status = 'Canceled';
@@ -402,28 +507,36 @@ driverController.cancelVehicleLending = (REQUEST, RESPONSE) => {
                         Vehicle.findOne({
                             registration_no
                         }, (error, vehicle) => {
-                            if (error) RESPONSE.send(error);
+                            if (error) RESPONSE.status(500).send({
+                                'error': error
+                            });
                             else if (vehicle) {
                                 vehicle.driver_license_no = null;
                                 vehicle.save((error, vehicle) => {
-                                    if (error) RESPONSE.send(error);
+                                    if (error) RESPONSE.status(500).send({
+                                        'error': error
+                                    });
                                     else if (vehicle) request.save((error, request) => {
-                                        if (error) RESPONSE.send(error);
-                                        else RESPONSE.send(request);
+                                        if (error) RESPONSE.status(500).send({
+                                            'error': error
+                                        });
+                                        else RESPONSE.status(200).send({
+                                            'msg': request
+                                        });
                                     });
                                 });
-                            } else RESPONSE.send({
+                            } else RESPONSE.status(400).send({
                                 'error': 'Vehicle not found'
                             });
                         });
-                    } else RESPONSE.send({
+                    } else RESPONSE.status(400).send({
                         'error': 'Illegal request status transition'
                     });
-                } else RESPONSE.send({
+                } else RESPONSE.status(400).send({
                     'error': 'Request not found'
                 });
             });
-        } else RESPONSE.send({
+        } else RESPONSE.status(400).send({
             'error': 'Driver not found'
         });
     });

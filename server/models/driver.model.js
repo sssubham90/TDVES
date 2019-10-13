@@ -109,7 +109,7 @@ driverSchema.methods.generateAuthToken = function(fn) {
         access,
         token
     });
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc, token);
     });
 }
@@ -128,14 +128,14 @@ driverSchema.methods.verifyOtp = function(otp, fn) {
 
 driverSchema.methods.addVehicle = function(registration_no, fn) {
     this.vehicles.push(registration_no);
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc);
     });
 }
 
 driverSchema.methods.removeVehicle = function(registration_no, fn) {
     this.vehicles.pull(registration_no);
-    this.save(function(err, doc, numbersAffected) {
+    this.save(function(err, doc) {
         fn(err, doc);
     });
 }
