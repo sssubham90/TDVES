@@ -7,7 +7,7 @@ module.exports = (APP) => {
     APP.route('/api/driver/verifyOTP')
         .get(driverController.verifyOTP);
     APP.route('/api/driver/addVehicle')
-        .post(driverController.addVehicle);
+        .get(driverController.addVehicle);
     APP.route('/api/driver/removeVehicle')
         .delete(driverController.removeVehicle);
     APP.route('/api/driver/details')
@@ -23,11 +23,11 @@ module.exports = (APP) => {
     APP.route('/api/driver/listVehicleRequest')
         .get(driverController.listVehicleRequest);
     APP.route('/api/driver/sendVehicleRequest')
-        .post(driverController.sendVehicleRequest);
+        .get(driverController.sendVehicleRequest);
     APP.route('/api/driver/acceptVehicleRequest')
-        .put(driverController.acceptVehicleRequest);
+        .get(driverController.acceptVehicleRequest);
     APP.route('/api/driver/rejectVehicleRequest')
-        .put(driverController.rejectVehicleRequest);
+        .get(driverController.rejectVehicleRequest);
     APP.route('/api/driver/cancelVehicleLending')
-        .put(driverController.cancelVehicleLending);
+        .get(driverController.cancelVehicleLending);
 };

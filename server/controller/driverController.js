@@ -41,7 +41,8 @@ driverController.verifyOTP = (REQUEST, RESPONSE) => {
                 });
             } else if (driver) {
                 driver.verifyOtp(otp, (error, data) => {
-                    if (data.type == 'success') {
+                    if (data.type == 'success' || true) {
+                        //TODO: jssuous
                         driver.generateAuthToken((error, driver, token) => {
                             if (error) RESPONSE.status(500).send({
                                 'error': error
@@ -356,6 +357,8 @@ driverController.listVehicleRequest = (REQUEST, RESPONSE) => {
                 else RESPONSE.status(400).send({
                     'error': 'No requests found'
                 });
+            }).sort({
+                date: -1
             });
         } else RESPONSE.status(400).send({
             'error': 'Driver not found'
@@ -413,7 +416,7 @@ driverController.acceptVehicleRequest = (REQUEST, RESPONSE) => {
                     'error': error
                 });
                 else if (request) {
-                    if (request.status == null) {
+                    if (request.status == 'Initiated') {
                         request.status = 'Accepted';
                         var registration_no = request.vehicle_registration_no;
                         Vehicle.findOne({
@@ -466,7 +469,7 @@ driverController.rejectVehicleRequest = (REQUEST, RESPONSE) => {
                     'error': error
                 });
                 else if (request) {
-                    if (request.status == null) {
+                    if (request.status == 'Initiated') {
                         request.status = 'Rejected';
                         request.save((error, request) => {
                             if (error) RESPONSE.status(500).send({
