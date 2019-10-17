@@ -3,6 +3,7 @@ let Driver = require('../models/driver.model');
 let Vehicle = require('../models/vehicle.model');
 let Report = require('../models/report.model');
 let Request = require('../models/request.model');
+let License = require('../models/license.model');
 
 driverController.login = (REQUEST, RESPONSE) => {
     var license_no = REQUEST.query.license_no;
@@ -162,8 +163,23 @@ driverController.details = (REQUEST, RESPONSE) => {
             'error': error
         });
         else if (driver) {
-            RESPONSE.status(200).send({
-                'msg': driver
+            var license_no = driver.license_no;
+            License.findOne({
+                license_no
+            }, (error, license) => {
+                if (error) RESPONSE.status(500).send({
+                    'error': error
+                });
+                else if (driver) {
+                    RESPONSE.status(200).send({
+                        'msg': {
+                            'driver': driver,
+                            'license': license
+                        }
+                    });
+                } else RESPONSE.status(400).send({
+                    'error': 'Driver not found'
+                });
             });
         } else RESPONSE.status(400).send({
             'error': 'Driver not found'

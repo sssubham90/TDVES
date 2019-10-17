@@ -1,6 +1,7 @@
 let officerController = {};
 let Officer = require('../models/officer.model');
 let Driver = require('../models/driver.model');
+let License = require('../models/license.model');
 let Vehicle = require('../models/vehicle.model');
 let Report = require('../models/report.model');
 let Fine = require('../models/fine.model');
@@ -22,7 +23,7 @@ officerController.login = (REQUEST, RESPONSE) => {
                 });
                 else if (result == true) {
                     officer.generateAuthToken((error, officer, token) => {
-                        if (err) RESPONSE.status(500).send({
+                        if (error) RESPONSE.status(500).send({
                             'error': error
                         });
                         else RESPONSE.status(200).header('x-auth', token).send({
@@ -155,10 +156,38 @@ officerController.vehicleDetails = (REQUEST, RESPONSE) => {
                 if (error) RESPONSE.status(500).send({
                     'error': error
                 });
-                else if (vehicle) RESPONSE.status(200).send({
-                    'msg': vehicle
-                });
-                else RESPONSE.status(400).send({
+                else if (vehicle) {
+                    var license_no = vehicle.driver_license_no || vehicle.owner_license_no;
+                    Driver.findOne({
+                        license_no
+                    }, (error, driver) => {
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
+                        });
+                        else if (driver) {
+                            License.findOne({
+                                license_no
+                            }, (error, license) => {
+                                if (error) RESPONSE.status(500).send({
+                                    'error': error
+                                });
+                                else if (license) {
+                                    RESPONSE.status(200).send({
+                                        'msg': {
+                                            'vehicle': vehicle,
+                                            'driver': driver,
+                                            'license': license
+                                        }
+                                    });
+                                } else RESPONSE.status(400).send({
+                                    'error': 'License not found'
+                                });
+                            });
+                        } else RESPONSE.status(400).send({
+                            'error': 'Driver not found'
+                        });
+                    });
+                } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });
             })
