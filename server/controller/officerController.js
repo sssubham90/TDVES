@@ -201,34 +201,42 @@ officerController.listFines = (REQUEST, RESPONSE) => {
     RESPONSE.status(200).send({
         'msg': [{
                 rule: "Driving without helmet",
+                type: "Driver",
                 fine: 2000
             },
             {
                 rule: "Driving without wearing seat belt",
+                type: "Driver",
                 fine: 1000
             },
             {
                 rule: "Drunken Driving",
+                type: "Driver",
                 fine: 10000
             },
             {
                 rule: "Driving without license",
+                type: "Driver",
                 fine: 5000
             },
             {
                 rule: "Overspeeding",
+                type: "Driver",
                 fine: 500
             },
             {
                 rule: "Invalid license",
+                type: "Driver",
                 fine: 2000
             },
             {
                 rule: "Diving without PUC certificate or with invalid PUC certificate",
+                type: "Vehicle",
                 fine: 1000
             },
             {
                 rule: "Diving without insurance or with invalid insurance",
+                type: "Vehicle",
                 fine: 1500
             }
         ]
@@ -254,31 +262,49 @@ officerController.chargeChallan = (REQUEST, RESPONSE) => {
                 });
                 else if (vehicle) {
                     var driver_license_no = vehicle.driver_license_no || vehicle.owner_license_no;
-                    if (geolocation.distanceTo(officer.location.coordinates, [long, lat]) < 100) {
-                        var fine = new Fine({
-                            driver_license_no,
-                            vehicle_registration_no,
-                            date,
-                            location: {
-                                type: "Point",
-                                coordinates: [
-                                    long,
-                                    lat
-                                ]
-                            },
-                            fine_details
+                    Driver.findOne({
+                        license_no: driver_license_no
+                    }, (error, driver) => {
+                        if (error) RESPONSE.status(500).send({
+                            'error': error
                         });
-                        fine.save((error, fine) => {
-                            if (error) RESPONSE.status(500).send({
-                                'error': error
+                        else if (driver) {
+                            if (geolocation.distanceTo(officer.location.coordinates, [long, lat]) < 100) {
+                                var fine = new Fine({
+                                    driver_license_no,
+                                    vehicle_registration_no,
+                                    date,
+                                    location: {
+                                        type: "Point",
+                                        coordinates: [
+                                            long,
+                                            lat
+                                        ]
+                                    },
+                                    fine_details
+                                });
+                                fine.save((error, fine) => {
+                                    if (error) RESPONSE.status(500).send({
+                                        'error': error
+                                    });
+                                    else {
+                                        vehicle.fines.push(fine);
+                                        vehicle.save();
+                                        driver.fines.push(fine);
+                                        driver.save();
+                                        RESPONSE.status(200).send({
+                                            'msg': fine
+                                        });
+                                    }
+                                });
+                            } else RESPONSE.status(400).send({
+                                'error': 'Officer out of duty area...'
                             });
-                            else RESPONSE.status(200).send({
-                                'msg': fine
-                            });
+                        } else RESPONSE.status(400).send({
+                            'error': 'Driver not found'
                         });
-                    } else RESPONSE.status(400).send({
-                        'error': 'Officer out of duty area...'
                     });
+
                 } else RESPONSE.status(400).send({
                     'error': 'Vehicle not found'
                 });

@@ -17,9 +17,11 @@ driverController.login = (REQUEST, RESPONSE) => {
                 });
             } else if (driver) {
                 driver.sendOtp((error, data) => {
-                    RESPONSE.status(200).send({
+                    if (data.type == 'success') RESPONSE.status(200).send({
                         'msg': 'Success',
-                        data
+                    });
+                    else RESPONSE.status(400).send({
+                        'error': data.messagel̥,
                     });
                 });
             } else {
@@ -42,8 +44,8 @@ driverController.verifyOTP = (REQUEST, RESPONSE) => {
                 });
             } else if (driver) {
                 driver.verifyOtp(otp, (error, data) => {
-                    if (data.type == 'success' || true) {
-                        //TODO: jssuous
+                    if (data.type == 'success') {
+
                         driver.generateAuthToken((error, driver, token) => {
                             if (error) RESPONSE.status(500).send({
                                 'error': error
@@ -55,7 +57,7 @@ driverController.verifyOTP = (REQUEST, RESPONSE) => {
                     } else {
                         console.log(data);
                         RESPONSE.status(500).send({
-                            'error': error
+                            'error': data.message
                         });
                     }
                 });

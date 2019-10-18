@@ -27,6 +27,10 @@ const fineSchema = new mongoose.Schema({
     },
     fine_details: [{
         rule: String,
+        type: {
+            type: String,
+            enum: ['Vehicle', 'Driver']
+        },
         fine: Number,
     }]
 });

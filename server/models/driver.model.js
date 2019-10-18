@@ -7,6 +7,11 @@ const sendOtp = require('../services/OTPService');
 const fineSchema = fineModel.schema;
 
 const driverSchema = new mongoose.Schema({
+    img_url: {
+        type: String,
+        trim: true,
+        required: [true, 'Image url required']
+    },
     license_no: {
         type: String,
         unique: true,
@@ -119,11 +124,11 @@ driverSchema.methods.toJSON = function() {
 }
 
 driverSchema.methods.sendOtp = function(fn) {
-    sendOtp.send(this.phone, "TDVES", fn);
+    sendOtp.send(`91${this.phone}`, "MSGIND", fn);
 }
 
 driverSchema.methods.verifyOtp = function(otp, fn) {
-    sendOtp.verify(this.phone, otp, fn);
+    sendOtp.verify(`91${this.phone}`, otp, fn);
 }
 
 driverSchema.methods.addVehicle = function(registration_no, fn) {

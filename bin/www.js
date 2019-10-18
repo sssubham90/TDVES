@@ -1,9 +1,9 @@
 /***********************************
  **** node module defined here *****
  ***********************************/
-const EXPRESS = require("express");
-const BODY_PARSER = require("body-parser");
-
+const EXPRESS = require('express');
+const BODY_PARSER = require('body-parser');
+const CORS = require('cors');
 
 /**creating express server app for server */
 const app = EXPRESS();
@@ -14,6 +14,7 @@ const app = EXPRESS();
  ********************************/
 app.set('port', process.env.PORT);
 app.use(EXPRESS.static("client"));
+app.use(CORS());
 app.use(BODY_PARSER.json({
     limit: '50mb'
 }));

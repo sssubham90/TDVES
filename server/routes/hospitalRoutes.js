@@ -8,7 +8,7 @@ module.exports = (APP) => {
     APP.route('/api/hospital/emergency')
         .get(hospitalController.emergency);
     APP.route('/api/hospital/confirmEmergency')
-        .put(hospitalController.confirmEmergency);
+        .get(hospitalController.confirmEmergency);
     APP.route('/api/hospital/hospitalEmergency')
         .get(hospitalController.hospitalEmergency);
 
