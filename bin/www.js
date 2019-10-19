@@ -27,6 +27,7 @@ app.use(BODY_PARSER.urlencoded({
  *** For handling CORS Error ***
  *******************************/
 app.all('/*', (REQUEST, RESPONSE, NEXT) => {
+    RESPONSE.header('Access-Control-Expose-Headers', 'x-auth');
     RESPONSE.header('Access-Control-Allow-Origin', '*');
     RESPONSE.header('Access-Control-Allow-Headers', 'Content-Type, api_key, Authorization, x-requested-with, Total-Count, Total-Pages, Error-Message');
     RESPONSE.header('Access-Control-Allow-Methods', 'POST, GET, DELETE, PUT, OPTIONS');
