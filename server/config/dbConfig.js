@@ -1,6 +1,6 @@
 let serverConfig = {
     mongodb: {
-        url: process.env.dbUrl || "mongodb://node:devil@127.0.0.1/TDVES",
+        url: "mongodb+srv://tdves:iamdevil666@cluster0-ovhk8.mongodb.net/test?retryWrites=true&w=majority",
     },
 };
 
