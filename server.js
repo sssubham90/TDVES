@@ -7,7 +7,7 @@ let dummyData = require('./dummyData');
 
 db(serverConfig.mongodb.url).then(resolve => {
     console.log(`*********DB is connected successfully*********`);
-    // dummyData.create();
+    dummyData.create();
     www();
 
 }).catch(err => {
