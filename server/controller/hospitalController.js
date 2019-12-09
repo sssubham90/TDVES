@@ -78,7 +78,7 @@ hospitalController.emergency = (REQUEST, RESPONSE) => {
             Report.find({
                 location_of_accident: {
                     $near: {
-                        $maxDistance: 1000, //in metres
+                        $maxDistance: 100000, //in metres
                         $geometry: {
                             type: hospital.location.type,
                             coordinates: hospital.location.coordinates
