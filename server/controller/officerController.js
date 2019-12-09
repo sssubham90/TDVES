@@ -269,7 +269,7 @@ officerController.chargeChallan = (REQUEST, RESPONSE) => {
                             'error': error
                         });
                         else if (driver) {
-                            if (geolocation.distanceTo(officer.location.coordinates, [long, lat]) < 100) {
+                            if (geolocation.distanceTo(officer.location.coordinates, [long, lat]) < 10000) {
                                 var fine = new Fine({
                                     driver_license_no,
                                     vehicle_registration_no,
